@@ -1,6 +1,8 @@
 
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <sys/socket.h>
+
 #include <errno.h>
 #include <signal.h>
 
@@ -82,3 +84,68 @@ int setup_connection(const char *hostname, const char *port) {
 }
 
 /*****************************************************************************/
+
+
+int get_peer_ip_port(int sockfd, uint32_t *ipaddr, uint16_t *port) {
+    struct sockaddr_in socket_info;
+    socklen_t socket_info_addr_len = (socklen_t)sizeof(socket_info);
+
+    getpeername(sockfd, (struct sockaddr*)(&socket_info), &socket_info_addr_len);
+    *ipaddr = socket_info.sin_addr.s_addr;
+    *port = socket_info.sin_port;
+    return 0;
+}
+
+static
+int create_master_socket(char *ipaddr, char *port, struct addrinfo **result) {
+    int sockfd= -1;
+    init_addrinfo(ipaddr, port, result);
+    sockfd = socket((*result)->ai_family, (*result)->ai_socktype, (*result)->ai_protocol);
+    if (sockfd == -1) {
+        perror("socket() system call");
+        exit(-1);
+    }
+    return sockfd;
+}
+
+int create_listening_socket(char *ipaddr, uint16_t port) {
+    struct addrinfo *res = NULL;
+    int sockfd = -1;
+    int reuse_addr = 1;
+    char *hostname = "?";
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+        perror("signal() system call");
+        exit(-1);
+    }
+    sockfd = create_master_socket(hostname, "11452", &res);
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*)(&reuse_addr), sizeof(int)) == -1) {
+        perror("setsockopt() system call");
+        exit(-1);
+    }
+    if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
+        perror("bind() system call");
+        exit(-1);
+    }
+    freeaddrinfo(res);
+    if (listen(sockfd, 10) == -1) {
+        perror("listen() system call");
+        exit(-1);
+    }
+    return sockfd;
+}
+
+int setup_accept(const int sockfd) {
+    int new_sockfd = -1;
+    while (new_sockfd == -1) {
+        struct sockaddr_in addr;
+        uint32_t addr_len = sizeof(addr);
+        new_sockfd = accept(sockfd, (struct sockaddr*)(&addr), &addr_len);
+        if (new_sockfd == -1) {
+            if (errno == EINTR) continue;
+            return (-1);
+        }
+        break;
+    }
+    return new_sockfd;
+}

@@ -1,7 +1,7 @@
-
 #include "util/cp_queue.h"
 #include "thread/thread.h"
-#include "network/message_sender.h"
+#include "thread/msend_thread.h"
+#include "network/message_send.h"
 
 extern cp_queue_t sender_queue;
 

@@ -11,6 +11,6 @@ typedef struct g_thread {
 } thread_meta_t;
 
 int thread_start(thread_meta_t*);
-void thread_terminate(thread_meta_t*);
+int thread_terminate(thread_meta_t*);
 
 #define thread_cancelpoint() pthread_testcancel()

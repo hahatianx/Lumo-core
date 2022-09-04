@@ -18,8 +18,8 @@ $(OBJ_DIR)/file_io.o:
 $(OBJ_DIR)/socket_unix.o:
 	$(CC) -c -I$(HEADFILES) -o $(OBJ_DIR)/socket_unix.o network/unix/socket.c
 
-$(OBJ_DIR)/message_sender.o:
-	$(CC) -c -I$(HEADFILES) -o $(OBJ_DIR)/message_sender.o network/unix/message_sender.c
+$(OBJ_DIR)/message_send.o:
+	$(CC) -c -I$(HEADFILES) -o $(OBJ_DIR)/message_send.o network/unix/message_send.c
 
 $(OBJ_DIR)/message.o:
 	$(CC) -c -I$(HEADFILES) -o $(OBJ_DIR)/message.o network/message.c
@@ -29,6 +29,11 @@ $(OBJ_DIR)/thread.o:
 
 $(OBJ_DIR)/sender_thrd.o:
 	$(CC) -c -I$(HEADFILES) -o $(OBJ_DIR)/sender_thrd.o thread/unix/msend_thread.c
+
+
+# MODULE
+
+SENDER_THRD_MODULE := sender_thrd.o thread.o message.o message_send.o socket_unix.o file_io.o unix_cp_queue.o queue.o
 
 # TESTS
 
@@ -43,7 +48,7 @@ queue_test_lib:
 message_test:
 	$(CC) -fPIC -o $(BUILD_DIR)/message_test.so -shared -I$(HEADFILES) test/network/message_test.c network/message.c
 
-MESSAGE_SENDER_TEST_OBJ := file_io.o socket_unix.o message_sender.o message.o
+MESSAGE_SENDER_TEST_OBJ := file_io.o socket_unix.o message_send.o message.o
 message_sender_test: $(patsubst %,$(OBJ_DIR)/%,$(MESSAGE_SENDER_TEST_OBJ))
 	$(CC) -fPIC -o $(BUILD_DIR)/message_sender_test.so -shared -I$(HEADFILES) test/network/message_sender_test.c $^
 
@@ -51,6 +56,9 @@ CP_QUEUE_TEST_OBJ := unix_cp_queue.o queue.o thread.o
 cp_queue_test: $(patsubst %, $(OBJ_DIR)/%, $(CP_QUEUE_TEST_OBJ))
 	$(CC) -fPIC -o $(BUILD_DIR)/cp_queue_test.so -shared -I$(HEADFILES) test/util/cp_queue_test.c $^
 
+SENDER_THRD_TEST_OBJ := $(SENDER_THRD_MODULE) 
+sender_thrd_test: $(patsubst %, $(OBJ_DIR)/%, $(SENDER_THRD_TEST_OBJ))
+	$(CC) -fPIC -o $(BUILD_DIR)/sender_thrd_test.so -shared -I$(HEADFILES) test/thread/msend_thread_test.c $^
 
 .PHONY: clean
 clean:
