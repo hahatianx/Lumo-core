@@ -25,5 +25,18 @@ int write_to_file(int fd, char *buffer, size_t bytes) {
 
 int read_from_file(int fd, char *buffer, size_t bytes) {
     memset(buffer, 0, bytes);
-    return 0;
+    size_t bytes_remaining = bytes;
+    while (bytes_remaining > 0) {
+        ssize_t bytes_read = read(fd, buffer, bytes_remaining);
+
+        if (bytes_read > 0) {
+            bytes_remaining -= bytes_read;
+            buffer += bytes_read;
+        } else if (bytes_read == -1) {
+            // stopped by interruption
+            if (errno == EINTR) continue;
+            return (-1);
+        }
+    }
+    return bytes;
 }

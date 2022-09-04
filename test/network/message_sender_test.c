@@ -4,7 +4,7 @@
 #include "test.h"
 #include "core.h"
 #include "network/message.h"
-#include "network/message_sender.h"
+#include "network/message_send.h"
 
 
 void test_send_message() {

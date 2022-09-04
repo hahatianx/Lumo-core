@@ -40,7 +40,7 @@ Of this post-haste and romage in the land..";
     // building message
     uint32_t dummy_message_size = strlen(dummy_message);
     msg->size = dummy_message_size;
-    memcpy(msg->msg, dummy_message, dummy_message_size);
+    memcpy(&msg->msg, dummy_message, dummy_message_size);
 
     // building block
     *((uint32_t*)buffer) = dummy_message_size;
@@ -60,7 +60,7 @@ void message_to_block_test() {
     uint32_t block_size = *((uint32_t*)block);
     ASSERT_TEST(actual_size == msg->size + 4, "assert actual size and msg size are the same.");
     ASSERT_TEST(actual_size == block_size + 4, "assert actual size and block size are the same.");
-    ASSERT_TEST(!memcmp(msg->msg, block + 4, actual_size - 4), "assert message are the same");
+    ASSERT_TEST(!memcmp(&msg->msg, block + 4, actual_size - 4), "assert message are the same");
     message_to_block(msg, converted_block, actual_size);
     ASSERT_TEST(!memcmp(block, converted_block, actual_size), "assert blocks are the same");
 
@@ -81,7 +81,7 @@ void block_to_message_test() {
     uint32_t block_size = *((uint32_t*)block);
     ASSERT_TEST(actual_size == msg->size + 4, "assert actual size and msg size are the same.");
     ASSERT_TEST(actual_size == block_size + 4, "assert actual size and block size are the same.");
-    ASSERT_TEST(!memcmp(msg->msg, block + 4, actual_size - 4), "assert message are the same");
+    ASSERT_TEST(!memcmp(&msg->msg, block + 4, actual_size - 4), "assert message are the same");
     block_to_message(block, converted_msg, actual_size);
     ASSERT_TEST(!memcmp(msg, converted_msg, actual_size), "assert blocks are the same");
 

@@ -19,7 +19,12 @@ int thread_start(thread_meta_t *thread_meta) {
     return 0;
 }
 
-void thread_terminate(thread_meta_t *thread_meta) {
-    pthread_join(thread_meta->sys_thread, NULL);
+int thread_terminate(thread_meta_t *thread_meta) {
+    int ret_code = pthread_join(*((pthread_t*)thread_meta->sys_thread), NULL);
+    if (ret_code) {
+        perror("pthread_join() failed.");
+        exit(ret_code);
+    }
     free(thread_meta->sys_thread);
+    return 0;
 }
