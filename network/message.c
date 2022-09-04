@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "network/message.h"
 #include "format.h"

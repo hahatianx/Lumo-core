@@ -62,7 +62,7 @@ void message_to_block_test() {
     ASSERT_TEST(actual_size == block_size + 4, "assert actual size and block size are the same.");
     ASSERT_TEST(!memcmp(&msg->msg, block + 4, actual_size - 4), "assert message are the same");
     message_to_block(msg, converted_block, actual_size);
-    ASSERT_TEST(!memcmp(block, converted_block, actual_size), "assert blocks are the same");
+    ASSERT_TEST(!memcmp(block + 4, converted_block + 4, actual_size - 4), "assert blocks are the same");
 
     free(msg);
 }
@@ -83,7 +83,7 @@ void block_to_message_test() {
     ASSERT_TEST(actual_size == block_size + 4, "assert actual size and block size are the same.");
     ASSERT_TEST(!memcmp(&msg->msg, block + 4, actual_size - 4), "assert message are the same");
     block_to_message(block, converted_msg, actual_size);
-    ASSERT_TEST(!memcmp(msg, converted_msg, actual_size), "assert blocks are the same");
+    ASSERT_TEST(!memcmp(msg + 4, converted_msg + 4, actual_size - 4), "assert blocks are the same");
 
     free(msg);
 }
